@@ -23,7 +23,7 @@ public:
 	WeightedGraphType(int size = 0);
 	~WeightedGraphType();
 
-	list<int> getAdjancencyList(int index) {
+	list<int> getAdjacencyList(int index) {
 		return graph[index];
 	}
 

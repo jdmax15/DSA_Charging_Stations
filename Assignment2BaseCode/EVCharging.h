@@ -22,6 +22,7 @@ public:
 	void printLocations();
 	void printAdjacencyMatrix();
 	void sortLocations();
+	void printAdjacentStations();
 };
 
 EVCharging::EVCharging() {
@@ -112,6 +113,36 @@ void EVCharging::sortLocations() {
 	}
 
     cout << endl;
+
+}
+
+void EVCharging::printAdjacentStations() {
+
+	int index;
+
+	cout << "Enter a location index: \n";
+
+	cin >> index;
+
+	list<int> adjList = weightedGraph->getAdjacencyList(index);
+
+	bool found = false;
+
+	cout << "\nAdjacent Locations with an available charging station for " << locations[index].locationName << ":" << endl << endl;
+
+	cout << setw (8) << "Index" << setw (20) << "Location name" << setw (20) <<"Charging station" << setw(20) << "Charging price" << endl;
+
+
+	for (int i : adjList) {
+		if (locations[i].chargerInstalled) {
+			locations[i].printLocation();
+			found = true;
+		}
+	}
+
+	if (!found) {
+		cout << "NONE\n" << endl;
+	}
 
 }
 
