@@ -1,0 +1,22 @@
+Windsor,1,0.35
+Rouse Hill,1,0.25
+Marsden Pk,0,-1
+Jordan Sprgs,1,0.35
+Penrith,1,0
+Blacktown,1,0.4
+Erskine Park,0,-1
+Wetherill Pk,1,0.25
+Prestons,0,-1
+Bringelly,1,0.35
+Fairfield,1,0.30
+Auburn,0,-1
+Bankstown,1,0
+Parramatta,1,0.50
+Wahroonga,1,0.35
+Eastwood,0,-1
+Burwood,0,-1
+Mascot,1,0.45
+Randwick,1,0.50
+Manly,1,0.45
+Mosman,1,0.25
+Macquarie Pk,1,0.25
