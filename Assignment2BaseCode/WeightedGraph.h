@@ -19,6 +19,7 @@ protected:
 	int gSize;      //number of vertices
 	list<int> *graph; // Store adjacency list
 	double **weights; // Store weights of edges
+	double *smallestWeight;
 public:
 	WeightedGraphType(int size = 0);
 	~WeightedGraphType();
@@ -31,6 +32,9 @@ public:
 		return weights[i][j];
 	}
 
+	double getSmallestWeight(int j) { return smallestWeight[j]; }
+
+	void shortestPath(int vertex);
 	void printAdjacencyList();
 	void printAdjacencyMatrix();
 };
@@ -60,6 +64,8 @@ WeightedGraphType::WeightedGraphType(int size) {
 	for (int i = 0; i < gSize; i++)
 		weights[i] = new double[gSize];
 
+	smallestWeight = new double[gSize];
+
 	for (int i = 0; i < gSize; i++) {
 		for (int j = 0; j < gSize; j++) {
 			double value;
@@ -81,10 +87,53 @@ WeightedGraphType::~WeightedGraphType() {
 
 	delete[] weights;
 
+	delete[] smallestWeight;
+
 	for (int index = 0; index < gSize; index++)
 		graph[index].clear();
 
 	delete[] graph;
+}
+
+void WeightedGraphType::shortestPath(int vertex)
+{
+	for (int j = 0; j < gSize; j++)
+		smallestWeight[j] = weights[vertex][j];
+
+	bool *weightFound;
+	weightFound = new bool[gSize];
+
+	for (int j = 0; j < gSize; j++)
+		weightFound[j] = false;
+
+	weightFound[vertex] = true;
+	smallestWeight[vertex] = 0;
+
+	for (int i = 0; i < gSize - 1; i++)
+	{
+		double minWeight = DBL_MAX;
+		int v = -1;
+
+		for (int j = 0; j < gSize; j++)
+			if (!weightFound[j])
+				if (smallestWeight[j] < minWeight)
+				{
+					v = j;
+					minWeight = smallestWeight[v];
+				}
+
+		if (v == -1) break;
+
+		weightFound[v] = true;
+
+		for (int j = 0; j < gSize; j++)
+			if (!weightFound[j])
+				if (minWeight != DBL_MAX && weights[v][j] != DBL_MAX)
+					if (minWeight + weights[v][j] < smallestWeight[j])
+						smallestWeight[j] = minWeight + weights[v][j];
+	}
+
+	delete[] weightFound;
 }
 
 void WeightedGraphType::printAdjacencyMatrix() { //print adjacency matrix for debug purpose

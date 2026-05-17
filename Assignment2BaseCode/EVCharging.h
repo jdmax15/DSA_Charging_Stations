@@ -23,6 +23,7 @@ public:
 	void printAdjacencyMatrix();
 	void sortLocations();
 	void printAdjacentStations();
+	void findNearestStation();
 };
 
 EVCharging::EVCharging() {
@@ -144,6 +145,48 @@ void EVCharging::printAdjacentStations() {
 		cout << "NONE\n" << endl;
 	}
 
+}
+
+void EVCharging::findNearestStation()
+{
+	int index;
+
+	cout << "Enter a location index: " << endl;
+	cin >> index;
+
+	weightedGraph->shortestPath(index);
+
+	double minDist = DBL_MAX;
+	int nearest = -1;
+
+	for (int i = 0; i < numberOfLocations; i++)
+	{
+		if (i == index)
+			continue;
+
+		if (!locations[i].chargerInstalled)
+			continue;
+
+		double d = weightedGraph->getSmallestWeight(i);
+
+		if (d < minDist)
+		{
+			minDist = d;
+			nearest = i;
+		}
+	}
+
+	if (nearest == -1)
+	{
+		cout << "NONE" << endl;
+	}
+	else
+	{
+		cout << "\nNearest charging station from " << locations[index].locationName << ":" << endl;
+		cout << setw(8) << "Index" << setw(20) << "Location name" << setw(20) << "Charging station" << setw(20) << "Charging price" << endl;
+		locations[nearest].printLocation();
+		cout << "\nDistance: " << minDist << " km" << endl;
+	}
 }
 
 #endif /* EVCHARGING_H_ */
