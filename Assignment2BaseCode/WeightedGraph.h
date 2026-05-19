@@ -112,6 +112,10 @@ void WeightedGraphType::shortestPath(int vertex) {
 	for (int j = 0; j < gSize; j++)
 		prev[j] = -1;
 
+	for (int j = 0; j < gSize; j++)
+		if (weights[vertex][j] != DBL_MAX)
+			prev[j] = vertex;
+
 	weightFound[vertex] = true;
 	smallestWeight[vertex] = 0;
 
