@@ -25,6 +25,7 @@ int main() {
 		cout << "5. Find nearest charging station" << endl;
 		cout << "6. Find cheapest charging station" << endl;
 		cout << "7. Find cheapest path with charging stop" << endl;
+		cout << "8. Find cheapest path with multiple charging stops" << endl;
 		cout << "0. Exit" << endl;
 		cout << "Enter choice: ";
 		cin >> choice;
@@ -51,6 +52,9 @@ int main() {
 			break;
 		case 7:
 			charging.findCheapestPath();
+			break;
+		case 8:
+			charging.findCheapestPathMultiCharge();
 			break;
 		case 0:
 			cout << "Exiting." << endl;
