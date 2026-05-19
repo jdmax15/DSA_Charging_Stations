@@ -24,6 +24,7 @@ public:
 	void sortLocations();
 	void printAdjacentStations();
 	void findNearestStation();
+	void findCheapestStation();
 };
 
 EVCharging::EVCharging() {
@@ -147,8 +148,67 @@ void EVCharging::printAdjacentStations() {
 
 }
 
-void EVCharging::findNearestStation()
-{
+void EVCharging::findCheapestStation() {
+	int index;
+	double kwh;
+
+	cout << "Enter a location index: " << endl;
+	cin >> index;
+
+	cout << "Enter amount to charge (10-50 kWh): " << endl;
+	cin >> kwh;
+
+	weightedGraph->shortestPath(index);
+
+	double minCost = DBL_MAX;
+	int cheapest = -1;
+
+	for (int i = 0; i < numberOfLocations; i++) {
+		if (i == index)
+			continue;
+
+		if (!locations[i].chargerInstalled)
+			continue;
+
+		if (locations[i].chargingPrice == 0 && kwh > 25)
+			continue;
+
+		double d = weightedGraph->getSmallestWeight(i);
+
+		if (d == DBL_MAX)
+			continue;
+
+		double travelCost = d * 2 * 0.10;
+		double chargingCost = kwh * locations[i].chargingPrice;
+		double totalCost = travelCost + chargingCost;
+
+		if (totalCost < minCost) {
+			minCost = totalCost;
+			cheapest = i;
+		}
+	}
+
+	if (cheapest == -1) {
+		cout << "NONE" << endl;
+	} else {
+		double dist = weightedGraph->getSmallestWeight(cheapest);
+		double travelCost = dist * 2 * 0.10;
+		double chargingCost = kwh * locations[cheapest].chargingPrice;
+
+		cout << "\nCheapest charging station from " << locations[index].locationName << ":" << endl;
+		cout << setw(8) << "Index" << setw(20) << "Location name" << setw(20) << "Charging station" << setw(20) << "Charging price" << endl;
+		locations[cheapest].printLocation();
+		cout << fixed << setprecision(2);
+		cout << "\nCost breakdown:" << endl;
+		cout << "  Distance:      " << dist << " km" << endl;
+		cout << "  Travel cost:   " << dist << " km x 2 (return) x $0.10/km = $" << travelCost << endl;
+		cout << "  Charging cost: " << kwh << " kWh x $" << locations[cheapest].chargingPrice << "/kWh = $" << chargingCost << endl;
+		cout << "  Total cost:    $" << travelCost << " + $" << chargingCost << " = $" << minCost << endl;
+		cout << defaultfloat;
+	}
+}
+
+void EVCharging::findNearestStation() {
 	int index;
 
 	cout << "Enter a location index: " << endl;
@@ -159,8 +219,7 @@ void EVCharging::findNearestStation()
 	double minDist = DBL_MAX;
 	int nearest = -1;
 
-	for (int i = 0; i < numberOfLocations; i++)
-	{
+	for (int i = 0; i < numberOfLocations; i++) {
 		if (i == index)
 			continue;
 
@@ -169,19 +228,15 @@ void EVCharging::findNearestStation()
 
 		double d = weightedGraph->getSmallestWeight(i);
 
-		if (d < minDist)
-		{
+		if (d < minDist) {
 			minDist = d;
 			nearest = i;
 		}
 	}
 
-	if (nearest == -1)
-	{
+	if (nearest == -1) {
 		cout << "NONE" << endl;
-	}
-	else
-	{
+	} else {
 		cout << "\nNearest charging station from " << locations[index].locationName << ":" << endl;
 		cout << setw(8) << "Index" << setw(20) << "Location name" << setw(20) << "Charging station" << setw(20) << "Charging price" << endl;
 		locations[nearest].printLocation();

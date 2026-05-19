@@ -95,8 +95,7 @@ WeightedGraphType::~WeightedGraphType() {
 	delete[] graph;
 }
 
-void WeightedGraphType::shortestPath(int vertex)
-{
+void WeightedGraphType::shortestPath(int vertex) {
 	for (int j = 0; j < gSize; j++)
 		smallestWeight[j] = weights[vertex][j];
 
@@ -109,15 +108,13 @@ void WeightedGraphType::shortestPath(int vertex)
 	weightFound[vertex] = true;
 	smallestWeight[vertex] = 0;
 
-	for (int i = 0; i < gSize - 1; i++)
-	{
+	for (int i = 0; i < gSize - 1; i++) {
 		double minWeight = DBL_MAX;
 		int v = -1;
 
 		for (int j = 0; j < gSize; j++)
 			if (!weightFound[j])
-				if (smallestWeight[j] < minWeight)
-				{
+				if (smallestWeight[j] < minWeight) {
 					v = j;
 					minWeight = smallestWeight[v];
 				}
