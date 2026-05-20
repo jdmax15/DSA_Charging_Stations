@@ -1,0 +1,142 @@
+COMP2009 Assignment 2 - Complexity Analysis
+============================================
+
+
+1. Introduction
+---------------
+
+This program models an electric vehicle charging network across the Sydney
+metropolitan area. Locations are represented as vertices in a weighted graph,
+with edge weights representing the distances between adjacent locations in
+kilometres. The program allows a user to query the network to find charging
+stations based on proximity and cost, helping EV drivers make informed
+decisions about where to charge.
+
+
+2. Data Structures
+------------------
+
+- double **weights
+  A dynamically allocated 2D array of size n x n, where weights[i][j] stores
+  the distance in kilometres between location i and location j. If two locations
+  are not directly connected, the value is set to DBL_MAX to represent infinity.
+  This allows O(1) lookup of any edge weight and is used in Dijkstra's algorithm
+  during the relaxation step.
+
+- list<int> *graph
+  A dynamically allocated array of n linked lists, where each index corresponds
+  to a location. graph[i] contains a linked list of the indices of all locations
+  directly connected to location i. When the graph is loaded, every non-zero
+  weight between i and j results in j being appended to graph[i]'s list. This
+  allows efficient traversal of only a node's direct neighbours and is used in
+  Task 4 to find adjacent charging stations.
+
+- map<int, Location> locations
+  A sorted associative container mapping an integer index to a Location object.
+  Each Location stores the location name, whether a charger is installed, and the
+  charging price per kWh. Using a map allows locations to be looked up by index
+  in O(log n) time and ensures entries are always stored in key order.
+
+- double *smallestWeight
+  A dynamically allocated 1D array of size n. After calling shortestPath(source),
+  smallestWeight[i] holds the shortest known distance from the source vertex to
+  vertex i. It is initialised from the source row of the weights matrix and
+  updated throughout Dijkstra's algorithm as shorter paths are discovered.
+
+- int *prev
+  A dynamically allocated 1D array of size n. prev[i] stores the index of the
+  vertex that immediately precedes vertex i on the shortest path from the source.
+  Initialised to -1 for all nodes, then set to the source for direct neighbours,
+  and updated during relaxation. After shortestPath runs, this array is traced
+  backwards from any node to reconstruct the full path, used in Tasks 7 and 8.
+
+- vector<Location> stations
+  A dynamically resizable array used temporarily in Task 3. All locations with
+  a charger installed are copied into this vector, which is then sorted in place
+  using STL sort. Vectors support random access and are compatible with STL
+  algorithms, making them well suited for this sorting operation.
+
+- stack<int>
+  A last-in first-out container used in Tasks 7 and 8 during path reconstruction.
+  Nodes are pushed onto the stack while tracing backwards from a charging station
+  to the origin using the prev array. Popping them off then produces the path in
+  the correct forward order without needing a separate reversal step.
+
+
+3. Algorithms
+-------------
+
+Algorithm 1 - Sort stations by price (Task 3)
+
+    collect all locations where chargerInstalled == true into a vector
+    sort the vector using STL sort with operator< on chargingPrice
+    print each location in sorted order
+
+
+Algorithm 2 - Dijkstra's shortest path (Tasks 5, 6, 7, 8)
+
+    initialise smallestWeight[j] = weights[source][j] for all j
+    initialise prev[j] = source for all direct neighbours, else -1
+    initialise weightFound[j] = false for all j
+    set weightFound[source] = true, smallestWeight[source] = 0
+
+    repeat n-1 times:
+        find unvisited vertex v with minimum smallestWeight
+        mark v as visited
+        for each unvisited neighbour j of v:
+            if smallestWeight[v] + weights[v][j] < smallestWeight[j]:
+                update smallestWeight[j]
+                set prev[j] = v
+
+
+Algorithm 3 - Find cheapest path with one charging stop (Task 7)
+
+    run Dijkstra from origin      -> save dist1[], prev1[]
+    run Dijkstra from destination -> save dist2[], prev2[]
+
+    for each valid charging station i:
+        cost = (dist1[i] + dist2[i]) * 0.10 + kWh * price[i]
+        track minimum cost and best station
+
+    reconstruct path:
+        trace prev1 from best station back to origin using a stack
+        trace prev2 from best station forward to destination using a vector
+    print combined path and cost breakdown
+
+
+4. Complexity Analysis
+----------------------
+
+Algorithm 1 - O(n log n)
+
+Collecting stations with chargers requires iterating over all n locations,
+which is O(n). STL sort on a vector of size k <= n is O(k log k), which in
+the worst case is O(n log n). The overall complexity is O(n log n).
+
+
+Algorithm 2 - O(n^2)
+
+The outer loop runs n-1 times. Inside each iteration, finding the unvisited
+vertex with the minimum distance scans all n vertices, which is O(n).
+Relaxing the neighbours of that vertex also scans all n vertices, which is
+O(n). The total complexity is O(n * 2n) = O(n^2).
+
+
+Algorithm 3 - O(n^2)
+
+Two calls to Dijkstra's algorithm each cost O(n^2). The scan over all
+stations to find the minimum cost stop is O(n). Path reconstruction traces
+at most n nodes in each segment, which is O(n). The dominant term is the
+two Dijkstra runs, giving an overall complexity of O(n^2).
+
+
+5. Conclusion
+-------------
+
+This program implements a weighted graph to model the Sydney EV charging
+network, supporting a range of queries from finding adjacent stations to
+computing optimal charging paths. Dijkstra's algorithm is the core of the
+most significant tasks, extended with predecessor tracking to enable full
+path reconstruction. The sorting, shortest path, and optimal path algorithms
+together demonstrate practical application of graph data structures and
+greedy search techniques.
